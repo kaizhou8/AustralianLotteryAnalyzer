@@ -1,0 +1,80 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  background-color: #f8f9fa;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px;
+}
+
+.card {
+  transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.badge {
+  font-size: 1.2rem;
+  padding: 0.5rem 1rem;
+  margin: 0.2rem;
+}
+
+.table th {
+  background-color: #f8f9fa;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+}
+
+.number-badge {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 50%;
+  margin: 2px;
+  font-weight: bold;
+}
+
+.number-hot {
+  background-color: #dc3545;
+  color: white;
+}
+
+.number-cold {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.number-neutral {
+  background-color: #6c757d;
+  color: white;
+}

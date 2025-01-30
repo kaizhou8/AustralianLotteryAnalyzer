@@ -1,0 +1,53 @@
+@model Dictionary<LottoType, LottoGameRules>
+@{
+    ViewData["Title"] = "澳洲彩票分析";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">澳洲彩票分析系统</h1>
+    
+    <div class="row">
+        @foreach (var game in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@game.Value.Name</h5>
+                        <p class="card-text">
+                            <strong>开奖日期：</strong>@game.Value.DrawDay<br />
+                            <strong>开奖时间：</strong>@game.Value.DrawTime.ToString(@"hh\:mm")<br />
+                            <strong>标准投注：</strong>$@game.Value.StandardGameCost<br />
+                            <strong>最低奖金：</strong>$@game.Value.MinimumDivision1Prize.ToString("N0")<br />
+                        </p>
+                        <div class="card-text mb-3">
+                            <strong>玩法说明：</strong><br />
+                            从1-@game.Value.MaxNumber中选择@game.Value.NumbersDrawn个号码
+                            @if (game.Value.SupplementaryCount > 0)
+                            {
+                                <span>，另有@game.Value.SupplementaryCount个补充号码</span>
+                            }
+                            @if (game.Value.PowerballCount.HasValue)
+                            {
+                                <span>，外加1个Powerball号码（1-@game.Value.PowerballMaxNumber）</span>
+                            }
+                        </div>
+                        <a href="@Url.Action("GameAnalysis", new { gameType = game.Key })" 
+                           class="btn btn-primary">查看分析</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // 添加动画效果
+            $('.card').hover(
+                function() { $(this).addClass('shadow-lg').css('cursor', 'pointer'); },
+                function() { $(this).removeClass('shadow-lg'); }
+            );
+        });
+    </script>
+}

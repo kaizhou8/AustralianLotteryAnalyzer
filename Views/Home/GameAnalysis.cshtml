@@ -1,0 +1,174 @@
+@model GameAnalysisViewModel
+@{
+    ViewData["Title"] = $"{Model.GameRules.Name} 分析";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">@Model.GameRules.Name 分析</h1>
+
+    <!-- 下期预测 -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">下期预测</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>推荐号码：</h6>
+                    <div class="d-flex flex-wrap mb-3">
+                        @foreach (var number in Model.Prediction.RecommendedNumbers)
+                        {
+                            <span class="badge bg-primary m-1">@number</span>
+                        }
+                        @if (Model.Prediction.RecommendedPowerball.HasValue)
+                        {
+                            <span class="badge bg-danger m-1">PB: @Model.Prediction.RecommendedPowerball</span>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>下次开奖：</strong> @Model.Prediction.NextDrawDate.ToString("yyyy-MM-dd HH:mm")</p>
+                    <p><strong>预计奖金：</strong> $@Model.Prediction.EstimatedDivision1Prize.ToString("N0")</p>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h6>选号依据：</h6>
+                <ul>
+                    @foreach (var reason in Model.Prediction.Reasoning)
+                    {
+                        <li>@reason</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 统计数据 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">热门号码</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="hotNumbersChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">冷门号码</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="coldNumbersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 最近开奖结果 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">最近开奖结果</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>开奖日期</th>
+                            <th>期号</th>
+                            <th>中奖号码</th>
+                            @if (Model.GameRules.PowerballCount.HasValue)
+                            {
+                                <th>Powerball</th>
+                            }
+                            else
+                            {
+                                <th>补充号码</th>
+                            }
+                            <th>一等奖金额</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var result in Model.LastResults)
+                        {
+                            <tr>
+                                <td>@result.DrawDate.ToString("yyyy-MM-dd")</td>
+                                <td>@result.DrawNumber</td>
+                                <td>
+                                    @string.Join(", ", result.WinningNumbers)
+                                </td>
+                                <td>
+                                    @if (result.PowerballNumber.HasValue)
+                                    {
+                                        @result.PowerballNumber
+                                    }
+                                    else
+                                    {
+                                        @string.Join(", ", result.SupplementaryNumbers)
+                                    }
+                                </td>
+                                <td>$@result.Division1Prize.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // 热门号码图表
+            var hotNumbersCtx = document.getElementById('hotNumbersChart').getContext('2d');
+            var hotNumbersChart = new Chart(hotNumbersCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Json.Serialize(Model.Statistics.NumberFrequency.Keys.Take(10)),
+                    datasets: [{
+                        label: '出现次数',
+                        data: @Json.Serialize(Model.Statistics.NumberFrequency.Values.Take(10)),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 冷门号码图表
+            var coldNumbersCtx = document.getElementById('coldNumbersChart').getContext('2d');
+            var coldNumbersChart = new Chart(coldNumbersCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Json.Serialize(Model.Statistics.NumberFrequency.Keys.TakeLast(10)),
+                    datasets: [{
+                        label: '出现次数',
+                        data: @Json.Serialize(Model.Statistics.NumberFrequency.Values.TakeLast(10)),
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
